@@ -6,41 +6,39 @@ from embeddings.embedder import Embedder
 from vectorstore.index import VectorIndex
 from vectorstore.retriever import Retriever
 
+from pipelines.rag_basic import BasicRAGPipeline
+from pipelines.llm_stub import DummyLLM
+
 
 def main():
-    # Load + clean docs
+    # Ingestion
     docs = load_documents("data/documents")
     docs = [clean_document(d) for d in docs]
 
-    # Chunk
+    # Chunking
     chunker = RecursiveChunker(chunk_size=500)
     chunks = chunker.chunk(docs)
 
-    print(f"Total chunks: {len(chunks)}")
-
-    # Prepare embeddings
-    texts = [c["text"] for c in chunks]
-    metadatas = chunks
-
+    # Embedding + index
     embedder = Embedder()
+    texts = [c["text"] for c in chunks]
     embeddings = embedder.embed_texts(texts)
 
-    # Build index
-    vector_index = VectorIndex(embedding_dim=embeddings.shape[1])
-    vector_index.add(embeddings, metadatas)
+    index = VectorIndex(embedding_dim=embeddings.shape[1])
+    index.add(embeddings, chunks)
 
-    # Retrieve
-    retriever = Retriever(embedder, vector_index)
-    results = retriever.retrieve(
-        query="What is Week 5 about?",
-        top_k=3
-    )
+    retriever = Retriever(embedder, index)
 
-    print("\nTop retrieval results:")
-    for r in results:
-        print("- Score:", r["score"])
-        print("  Text preview:", r["metadata"]["text"][:200])
-        print()
+    # RAG pipeline
+    llm = DummyLLM()
+    rag = BasicRAGPipeline(retriever, llm)
+
+    result = rag.run("What is this document about?", top_k=3)
+
+    print("\nRAG OUTPUT")
+    print("Answer:", result["answer"])
+    print("Sources:", result["sources"])
+
 
 if __name__ == "__main__":
     main()

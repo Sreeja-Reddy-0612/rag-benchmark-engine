@@ -9,5 +9,5 @@ RAG pipeline architectures.
 - [x] Step 1: Document ingestion and normalization
 - [x] Step 2: Chunking engine (fixed and recursive strategies)
 - [x] Step 3: Embeddings and FAISS-based vector store
-- [ ] Step 4: RAG pipelines (basic and reranked)
+- [x] Step 4: RAG pipelines (basic and reranked)
 - [ ] Step 5: Evaluation and benchmarking
