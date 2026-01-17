@@ -10,4 +10,4 @@ RAG pipeline architectures.
 - [x] Step 2: Chunking engine (fixed and recursive strategies)
 - [x] Step 3: Embeddings and FAISS-based vector store
 - [x] Step 4: RAG pipelines (basic and reranked)
-- [ ] Step 5: Evaluation and benchmarking
+- [x] Step 5: Evaluation and benchmarking
