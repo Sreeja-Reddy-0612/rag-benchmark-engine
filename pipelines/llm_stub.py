@@ -2,8 +2,12 @@
 
 class DummyLLM:
     """
-    Temporary stub LLM for pipeline testing.
-    Replace with OpenAI / Gemini / Claude later.
+    Stub LLM that matches the real LLM interface.
     """
-    def generate(self, prompt: str) -> str:
-        return "[LLM OUTPUT PLACEHOLDER]"
+    def generate(self, prompt: str):
+        return {
+            "text": "[LLM OUTPUT PLACEHOLDER]",
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cost": 0.0
+        }

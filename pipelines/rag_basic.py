@@ -1,24 +1,18 @@
 # pipelines/rag_basic.py
 
 from typing import List, Dict
-import os
-
 from vectorstore.retriever import Retriever
 
 
 class BasicRAGPipeline:
     def __init__(self, retriever: Retriever, llm_client):
-        """
-        retriever: semantic retriever
-        llm_client: any LLM client with a generate(prompt) method
-        """
         self.retriever = retriever
         self.llm = llm_client
 
     def _build_prompt(self, query: str, contexts: List[str]) -> str:
         context_block = "\n\n".join(contexts)
 
-        prompt = f"""
+        return f"""
 You are a helpful assistant.
 Answer the question using ONLY the context below.
 If the answer is not present, say "I don't know".
@@ -30,8 +24,7 @@ Question:
 {query}
 
 Answer:
-"""
-        return prompt.strip()
+""".strip()
 
     def run(self, query: str, top_k: int = 5) -> Dict:
         retrieved = self.retriever.retrieve(query, top_k=top_k)
@@ -41,10 +34,12 @@ Answer:
 
         prompt = self._build_prompt(query, contexts)
 
-        answer = self.llm.generate(prompt)
+        result = self.llm.generate(prompt)
 
         return {
-            "query": query,
-            "answer": answer,
-            "sources": list(set(sources))
+            "answer": result["text"],
+            "sources": list(set(sources)),
+            "input_tokens": result["input_tokens"],
+            "output_tokens": result["output_tokens"],
+            "cost": result["cost"]
         }

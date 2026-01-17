@@ -12,7 +12,9 @@ from vectorstore.index import VectorIndex
 from vectorstore.retriever import Retriever
 
 from pipelines.rag_basic import BasicRAGPipeline
-from pipelines.llm_stub import DummyLLM
+# from pipelines.llm_stub import DummyLLM
+from llm.openai_client import OpenAIClient
+
 
 from evaluation.retrieval_metrics import recall_at_k, mean_reciprocal_rank
 from evaluation.answer_quality import simple_answer_match
@@ -48,11 +50,25 @@ def run_benchmark():
     eval_data = load_eval_dataset()
     retriever = build_retriever()
 
-    llm = DummyLLM()
+    # llm = DummyLLM()
+    # llm = OpenAIClient()
+    # llm = OpenAIClient(model="gpt-4o-mini")
+    try:
+        
+        llm = OpenAIClient(model="gpt-4o-mini")
+        print("Using OpenAI LLM")
+    except Exception:
+        
+        from pipelines.llm_stub import DummyLLM
+        llm = DummyLLM()
+        print("Falling back to DummyLLM (no quota)")
+
+
+
     rag_pipeline = BasicRAGPipeline(retriever, llm)
 
     results = []
-
+    total_cost = 0.0
     for sample in eval_data:
         question = sample["question"]
         relevant_docs = sample["relevant_docs"]
@@ -63,18 +79,23 @@ def run_benchmark():
         retrieved_sources = rag_result["sources"]
         generated_answer = rag_result["answer"]
 
+        total_cost += rag_result["cost"]
+
         metrics = {
-            "question": question,
-            "recall@5": recall_at_k(retrieved_sources, relevant_docs, k=5),
-            "mrr": mean_reciprocal_rank(retrieved_sources, relevant_docs),
-            "qa_score": simple_answer_match(generated_answer, expected_answer),
-            "hallucinated": is_hallucinated(
-                generated_answer,
-                [generated_answer]  # stub context for now
-            ),
-        }
+    "question": question,
+    "recall@5": recall_at_k(retrieved_sources, relevant_docs, 5),
+    "mrr": mean_reciprocal_rank(retrieved_sources, relevant_docs),
+    "qa_score": simple_answer_match(generated_answer, expected_answer),
+    "hallucinated": is_hallucinated(
+        generated_answer,
+        [generated_answer]
+    ),
+    "cost": rag_result["cost"]
+}
+
 
         results.append(metrics)
+    print("Total cost for benchmark run: $", round(total_cost, 6))
 
     output_path = BASE_DIR / "experiments" / "results" / "benchmark_results.json"
     output_path.parent.mkdir(parents=True, exist_ok=True)

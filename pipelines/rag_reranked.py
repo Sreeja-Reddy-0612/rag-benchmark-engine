@@ -50,9 +50,12 @@ Answer:
         sources = [r["metadata"]["doc_id"] for r in reranked]
 
         prompt = self._build_prompt(query, contexts)
-        answer = self.llm.generate(prompt)
+        result = self.llm.generate(prompt)
 
         return {
-            "answer": answer,
-            "sources": list(set(sources))
-        }
+    "answer": result["text"],
+    "sources": list(set(sources)),
+    "input_tokens": result["input_tokens"],
+    "output_tokens": result["output_tokens"],
+    "cost": result["cost"]
+}

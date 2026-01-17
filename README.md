@@ -13,4 +13,4 @@ RAG pipeline architectures.
 - [x] Step 5: Evaluation engine (retrieval, QA, hallucination)
 - [x] Step 6: Automated benchmark runner
 - [x] Step 7: Multiple pipeline comparison (basic vs reranked)
-- [ ] Step 8: Real LLM integration + cost tracking
+- [x] Step 8: Real LLM integration + cost tracking
