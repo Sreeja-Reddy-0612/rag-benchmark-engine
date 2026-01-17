@@ -1,0 +1,9 @@
+[
+  {
+    "question": "What is this document about?",
+    "recall@5": 1.0,
+    "mrr": 1.0,
+    "qa_score": 0.0,
+    "hallucinated": false
+  }
+]
