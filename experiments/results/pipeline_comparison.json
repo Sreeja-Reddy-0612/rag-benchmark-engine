@@ -1,0 +1,18 @@
+{
+  "basic_rag": [
+    {
+      "recall@5": 1.0,
+      "mrr": 0.3333333333333333,
+      "qa_score": 0.0,
+      "hallucinated": false
+    }
+  ],
+  "reranked_rag": [
+    {
+      "recall@5": 1.0,
+      "mrr": 0.3333333333333333,
+      "qa_score": 0.0,
+      "hallucinated": false
+    }
+  ]
+}

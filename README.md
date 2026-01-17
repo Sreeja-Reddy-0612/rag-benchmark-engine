@@ -12,5 +12,5 @@ RAG pipeline architectures.
 - [x] Step 4: RAG pipeline (basic, grounded)
 - [x] Step 5: Evaluation engine (retrieval, QA, hallucination)
 - [x] Step 6: Automated benchmark runner
-- [ ] Step 7: Multiple pipeline comparison (basic vs reranked)
+- [x] Step 7: Multiple pipeline comparison (basic vs reranked)
 - [ ] Step 8: Real LLM integration + cost tracking
