@@ -1,0 +1,7 @@
+{
+  "recall@5": 1.0,
+  "mrr": 0.5,
+  "qa_score": 0.0,
+  "hallucination_rate": 0.0,
+  "avg_cost": 0.0
+}

@@ -20,6 +20,7 @@ from evaluation.retrieval_metrics import recall_at_k, mean_reciprocal_rank
 from evaluation.answer_quality import simple_answer_match
 from evaluation.hallucination import is_hallucinated
 
+from experiments.regression.regression_detector import detect_regression
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 
@@ -34,7 +35,7 @@ def build_retriever():
     docs = load_documents(BASE_DIR / "data" / "documents")
     docs = [clean_document(d) for d in docs]
 
-    chunker = RecursiveChunker(chunk_size=500)
+    chunker = RecursiveChunker(chunk_size=100)
     chunks = chunker.chunk(docs)
 
     embedder = Embedder()
@@ -103,9 +104,34 @@ def run_benchmark():
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)
 
+    # Aggregate current metrics
+    avg_metrics = {
+        "recall@5": sum(r["recall@5"] for r in results) / len(results),
+        "mrr": sum(r["mrr"] for r in results) / len(results),
+        "qa_score": sum(r["qa_score"] for r in results) / len(results),
+        "hallucination_rate": sum(
+            1 for r in results if r["hallucinated"]
+        ) / len(results),
+        "avg_cost": total_cost / len(results)
+    }
+
+    # Load baseline
+    baseline_path = BASE_DIR / "experiments" / "baselines" / "baseline_v1.json"
+    with open(baseline_path, "r", encoding="utf-8") as f:
+        baseline = json.load(f)
+
+    # Detect regression
+    regression_report = detect_regression(avg_metrics, baseline)
+
     print("\n=== Benchmark Complete ===")
     for r in results:
         print(r)
+
+    print("\n=== Regression Check ===")
+    if regression_report["any_regression"]:
+        print("❌ Regression detected:", regression_report)
+    else:
+        print("✅ No regression detected")
 
 
 if __name__ == "__main__":
